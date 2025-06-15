@@ -1,0 +1,147 @@
+@import "tailwindcss";
+@plugin "daisyui";
+@plugin "tailwind-scrollbar";
+
+@plugin "daisyui" {
+  themes: all;
+}
+
+@plugin "daisyui/theme" {
+  name: "cloudy";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(97% 0.014 254.604);
+  --color-base-200: oklch(93% 0.032 255.585);
+  --color-base-300: oklch(88% 0.059 254.128);
+  --color-base-content: oklch(37% 0.146 265.522);
+  --color-primary: oklch(87% 0.15 154.449);
+  --color-primary-content: oklch(26% 0.065 152.934);
+  --color-secondary: oklch(84% 0.143 164.978);
+  --color-secondary-content: oklch(26% 0.051 172.552);
+  --color-accent: oklch(87% 0.169 91.605);
+  --color-accent-content: oklch(27% 0.077 45.635);
+  --color-neutral: oklch(37% 0.146 265.522);
+  --color-neutral-content: oklch(97% 0.014 254.604);
+  --color-info: oklch(68% 0.169 237.323);
+  --color-info-content: oklch(97% 0.013 236.62);
+  --color-success: oklch(69% 0.17 162.48);
+  --color-success-content: oklch(97% 0.021 166.113);
+  --color-warning: oklch(70% 0.213 47.604);
+  --color-warning-content: oklch(98% 0.016 73.684);
+  --color-error: oklch(65% 0.241 354.308);
+  --color-error-content: oklch(97% 0.014 343.198);
+  --radius-selector: 0.5rem;
+  --radius-field: 2rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 1;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark-plattle";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: oklch(14% 0 0);
+  --color-base-200: oklch(20% 0 0);
+  --color-base-300: oklch(26% 0 0);
+  --color-base-content: oklch(97% 0 0);
+  --color-primary: oklch(80% 0.114 19.571);
+  --color-primary-content: oklch(25% 0.092 26.042);
+  --color-secondary: oklch(82% 0.111 230.318);
+  --color-secondary-content: oklch(29% 0.066 243.157);
+  --color-accent: oklch(82% 0.119 306.383);
+  --color-accent-content: oklch(29% 0.149 302.717);
+  --color-neutral: oklch(43% 0 0);
+  --color-neutral-content: oklch(98% 0 0);
+  --color-info: oklch(71% 0.143 215.221);
+  --color-info-content: oklch(98% 0.019 200.873);
+  --color-success: oklch(72% 0.219 149.579);
+  --color-success-content: oklch(98% 0.018 155.826);
+  --color-warning: oklch(76% 0.188 70.08);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(65% 0.241 354.308);
+  --color-error-content: oklch(97% 0.014 343.198);
+  --radius-selector: 0rem;
+  --radius-field: 1rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 1;
+}
+
+@plugin "daisyui/theme" {
+  name: "purple";
+  default: false;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(29% 0.149 302.717);
+  --color-base-200: oklch(38% 0.176 304.987);
+  --color-base-300: oklch(43% 0.218 303.724);
+  --color-base-content: oklch(94% 0.033 307.174);
+  --color-primary: oklch(79% 0.184 86.047);
+  --color-primary-content: oklch(28% 0.066 53.813);
+  --color-secondary: oklch(70% 0.14 182.503);
+  --color-secondary-content: oklch(98% 0.014 180.72);
+  --color-accent: oklch(71% 0.143 215.221);
+  --color-accent-content: oklch(98% 0.019 200.873);
+  --color-neutral: oklch(49% 0.265 301.924);
+  --color-neutral-content: oklch(97% 0.014 308.299);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: oklch(84% 0.238 128.85);
+  --color-success-content: oklch(27% 0.072 132.109);
+  --color-warning: oklch(75% 0.183 55.934);
+  --color-warning-content: oklch(26% 0.079 36.259);
+  --color-error: oklch(71% 0.202 349.761);
+  --color-error-content: oklch(28% 0.109 3.907);
+  --radius-selector: 2rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 2px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/* Width of the entire scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px; /* Vertical scrollbar */
+  height: 5px; /* Horizontal scrollbar */
+}
+
+/* Track (background of the scrollbar) */
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #000;
+  border-radius: 2px;
+}
+
+/* Handle (draggable part of scrollbar) */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+div::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+#_rht_toaster div div {
+  @apply bg-base-100 text-base-content;
+}
+
+#_rht_toaster div div div div .go2344853693 {
+  @apply bg-green-500;
+}
+
+#_rht_toaster div div div div .go2534082608 {
+  @apply bg-red-500;
+}

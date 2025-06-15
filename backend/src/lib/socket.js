@@ -6,7 +6,11 @@ const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
-   cors: [process.env.CLIENT_URL, 'http://localhost:5173'],
+   cors: {
+      origin: [process.env.CLIENT_URL, 'http://localhost:5173'], // allow these origins
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // allow these HTTP methods (optional)
+      credentials: true, // if you want to allow cookies or credentials
+   },
 });
 
 export const getReceiverSocketId = (userId) => userSocketMap[userId];

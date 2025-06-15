@@ -10,12 +10,23 @@ import userRoutes from './routes/user.route.js';
 
 dotenv.config();
 
+const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'];
+
 app.use(
    cors({
-      origin: [process.env.CLIENT_URL, 'http://localhost:5173'],
+      origin: function (origin, callback) {
+         // allow requests with no origin like mobile apps or curl requests
+         if (!origin) return callback(null, true);
+         if (allowedOrigins.includes(origin)) {
+            callback(null, true);
+         } else {
+            callback(new Error('CORS policy: This origin is not allowed'));
+         }
+      },
       credentials: true,
    })
 );
+
 app.use(json({ limit: '50MB' }));
 app.use(urlencoded({ limit: '50MB', extended: true }));
 app.use(cookieParser());

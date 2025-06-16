@@ -6,7 +6,13 @@ import User from '../models/user.model.js';
 
 export const getUsers = async (req, res) => {
    try {
-      const users = await User.find({ _id: { $ne: req.user._id } }).select('-password');
+      const users = await User.find({ _id: { $ne: req.user._id } })
+         .select('-password')
+         .sort([
+            ['isOnline', -1], // online users first
+            ['lastActiveAt', -1], // then recently active
+            ['fullName', 1], // then alphabetically
+         ]);
 
       res.status(200).json({
          users,

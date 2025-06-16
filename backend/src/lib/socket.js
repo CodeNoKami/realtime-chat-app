@@ -15,9 +15,9 @@ const allowedOrigins = process.env.CLIENT_URL
 
 const io = new Server(server, {
    cors: {
-      origin: allowedOrigins,
+      origin: '*',
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-      credentials: true,
+      credentials: false,
    },
 });
 

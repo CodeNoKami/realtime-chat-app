@@ -16,14 +16,9 @@ const allowedOrigins = process.env.CLIENT_URL
 
 app.use(
    cors({
-      origin: function (origin, callback) {
-         if (!origin || allowedOrigins.includes(origin)) {
-            callback(null, true);
-         } else {
-            callback(new Error('CORS policy: This origin is not allowed'));
-         }
-      },
-      credentials: true,
+      origin: '*',
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      credentials: false,
    })
 );
 

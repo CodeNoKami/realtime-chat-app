@@ -72,7 +72,10 @@ const useChatStore = create((set, get) => ({
 
          // Only play sound if message is from someone else
          if (!isMessageSentFromSelectedUser) {
-            notificationAudio.play().catch((err) => console.warn('Failed to play sound', err));
+            notificationAudio.play().catch((err) => {
+               console.error('Error playing notification sound:', err);
+               toast.error('Error playing notification sound.');
+            });
          }
       });
    },

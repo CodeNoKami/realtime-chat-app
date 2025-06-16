@@ -5,67 +5,52 @@ import toast from 'react-hot-toast';
 import useChatStore from '../store/useChatStore';
 
 const MessageInput = () => {
-   // Destructure necessary state/actions from your chat store
    const { sendMessage, editMessage, editingMessage, clearEditingMessage, isMessageSending } =
       useChatStore();
 
-   // Local state for message text and image preview (base64 string)
    const [text, setText] = useState('');
    const [imagePreview, setImagePreview] = useState(null);
-
-   // Ref for the hidden file input
    const fileInputRef = useRef(null);
 
-   // Handle user selecting an image file
    const handleImageChange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
 
-      // Validate image file type
       if (!file.type.startsWith('image/')) {
          toast.error('Please choose an image file.');
          return;
       }
 
-      // Validate file size (max 10MB)
       const maxSize = 10 * 1024 * 1024;
       if (file.size > maxSize) {
          toast.error('File size exceeds 10MB. Please choose a smaller file.');
          return;
       }
 
-      // Convert image file to base64 preview
       const reader = new FileReader();
       reader.readAsDataURL(file);
       reader.onload = () => setImagePreview(reader.result);
    };
 
-   // Remove currently attached image
    const handleRemoveImage = () => {
       setImagePreview(null);
       if (fileInputRef.current) fileInputRef.current.value = null;
    };
 
-   // Handle form submit — send or edit message
    const handleSendMessage = async (e) => {
       e.preventDefault();
-
-      // Ignore if no content
       if (!text.trim() && !imagePreview) return;
 
       try {
          const messageData = { text: text.trim(), image: imagePreview };
 
          if (editingMessage) {
-            // Edit existing message
             await editMessage(editingMessage._id, messageData);
             clearEditingMessage();
          } else {
-            // Send new message
             await sendMessage(messageData);
          }
 
-         // Clear input after send/edit
          setText('');
          setImagePreview(null);
          if (fileInputRef.current) fileInputRef.current.value = null;
@@ -75,14 +60,12 @@ const MessageInput = () => {
       }
    };
 
-   // Reset input when selectedUser changes
    useEffect(() => {
       if (fileInputRef.current) fileInputRef.current.value = null;
       setText('');
       setImagePreview(null);
-   }, [useChatStore.getState().selectedUser._id]);
+   }, [useChatStore.getState().selectedUser?._id]);
 
-   // Populate input fields when editing a message
    useEffect(() => {
       if (editingMessage) {
          setText(editingMessage.text || '');
@@ -92,7 +75,6 @@ const MessageInput = () => {
 
    return (
       <div className="p-4 w-full">
-         {/* Image preview and remove button */}
          {imagePreview && (
             <div className="mb-3 flex items-center gap-2">
                <div className="relative">
@@ -112,7 +94,6 @@ const MessageInput = () => {
             </div>
          )}
 
-         {/* Message input form */}
          <form onSubmit={handleSendMessage} className="flex items-center gap-2">
             <div className="flex-1 flex gap-2">
                <input
@@ -132,7 +113,6 @@ const MessageInput = () => {
                   disabled={isMessageSending}
                />
 
-               {/* Button to trigger file input */}
                <button
                   type="button"
                   className={`hidden sm:flex btn btn-soft btn-circle ${
@@ -145,7 +125,6 @@ const MessageInput = () => {
                </button>
             </div>
 
-            {/* Send/Edit button */}
             <button
                type="submit"
                className={`btn btn-circle ${text.trim() || imagePreview ? 'btn-primary' : ''}`}
@@ -161,7 +140,6 @@ const MessageInput = () => {
             </button>
          </form>
 
-         {/* Cancel editing */}
          {editingMessage && (
             <div className="text-sm text-gray-400 mt-1 flex items-center gap-4">
                <span>Editing message</span>

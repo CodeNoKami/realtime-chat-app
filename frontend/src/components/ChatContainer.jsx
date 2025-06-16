@@ -12,8 +12,6 @@ const ChatContainer = () => {
    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
    const [lightboxImage, setLightboxImage] = useState(null);
 
-   // We'll use this ref only for scrolling to the last message,
-   // but currently you assign it on every message, so change below
    const messageEndRef = useRef(null);
 
    const {
@@ -39,7 +37,6 @@ const ChatContainer = () => {
       };
    }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
-   // Scroll to bottom when messages update
    useEffect(() => {
       if (messageEndRef.current) {
          messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -67,8 +64,6 @@ const ChatContainer = () => {
                <>
                   {messages.map((message, index) => {
                      const isOwn = message.senderId === authUser.user._id;
-
-                     // Assign ref only to the last message for scrolling
                      const isLastMessage = index === messages.length - 1;
 
                      return (

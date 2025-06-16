@@ -119,6 +119,7 @@ const useChatStore = create((set, get) => ({
    },
 
    setSelectedUser: (user) => set({ selectedUser: user }),
+   startEditingMessage: (message) => set({ editingMessage: message }),
 }));
 
 export default useChatStore;

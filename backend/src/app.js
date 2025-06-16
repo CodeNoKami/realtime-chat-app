@@ -15,7 +15,6 @@ const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'];
 app.use(
    cors({
       origin: function (origin, callback) {
-         // allow requests with no origin like mobile apps or curl requests
          if (!origin) return callback(null, true);
          if (allowedOrigins.includes(origin)) {
             callback(null, true);
@@ -34,9 +33,16 @@ app.use(cookieParser());
 app.use('/auth', userRoutes);
 app.use('/messages', messageRoutes);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000; // fallback port if .env is missing
 
-server.listen(PORT, () => {
-   console.log(`Server is running on port ${PORT}`);
-   connectDB();
-});
+connectDB()
+   .then(() => {
+      server.listen(PORT, () => {
+         console.log(`🚀 Server is running on port ${PORT}`);
+      });
+   })
+   .catch((err) => {
+      console.error('❌ DB connection failed. Server not started.');
+      console.error(err);
+      process.exit(1);
+   });

@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { json, urlencoded } from 'express';
 import { app, server } from './lib/socket.js';
 
-import { connectDB } from './lib/db.js';
+import connectDB from './lib/db.js';
 import messageRoutes from './routes/message.route.js';
 import userRoutes from './routes/user.route.js';
 

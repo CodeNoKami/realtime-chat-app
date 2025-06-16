@@ -23,32 +23,38 @@ io.on('connection', async (socket) => {
    const userId = socket.handshake.query.userId;
 
    if (userId) {
-      // Save socket ID
       userSocketMap[userId] = socket.id;
 
-      // ✅ Mark user as online in DB
-      await userModel.findByIdAndUpdate(userId, {
-         isOnline: true,
-         status: 'online',
-      });
+      await userModel.findByIdAndUpdate(
+         userId,
+         {
+            isOnline: true,
+            status: 'online',
+         },
+         {
+            new: true,
+         }
+      );
 
-      // ✅ Emit updated online users
       io.emit('getOnlineUsers', Object.keys(userSocketMap));
    }
 
    socket.on('disconnect', async () => {
       if (userId) {
-         // Remove user from socket map
          delete userSocketMap[userId];
 
-         // ✅ Mark user as offline and update lastActiveAt
-         await userModel.findByIdAndUpdate(userId, {
-            isOnline: false,
-            status: 'offline',
-            lastActiveAt: new Date(),
-         });
+         await userModel.findByIdAndUpdate(
+            userId,
+            {
+               isOnline: false,
+               status: 'offline',
+               lastActiveAt: new Date(),
+            },
+            {
+               new: true,
+            }
+         );
 
-         // ✅ Emit updated online users
          io.emit('getOnlineUsers', Object.keys(userSocketMap));
       }
    });

@@ -12,7 +12,10 @@ const ChatContainer = () => {
    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
    const [lightboxImage, setLightboxImage] = useState(null);
 
+   // We'll use this ref only for scrolling to the last message,
+   // but currently you assign it on every message, so change below
    const messageEndRef = useRef(null);
+
    const {
       messages,
       getMessages,
@@ -27,21 +30,19 @@ const ChatContainer = () => {
 
    useEffect(() => {
       if (!selectedUser?._id) return;
+
       getMessages(selectedUser._id);
       subscribeToMessages();
-      return () => unsubscribeFromMessages();
+
+      return () => {
+         unsubscribeFromMessages();
+      };
    }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
+   // Scroll to bottom when messages update
    useEffect(() => {
-      if (messageEndRef.current && messages.length) {
+      if (messageEndRef.current) {
          messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
-      }
-   }, [messages]);
-
-   useEffect(() => {
-      const chatContainer = document.querySelector('.chatContainer');
-      if (chatContainer) {
-         chatContainer.scrollTop = chatContainer.scrollHeight;
       }
    }, [messages]);
 
@@ -58,16 +59,23 @@ const ChatContainer = () => {
       <div className="flex flex-1 flex-col overflow-auto">
          <ChatHeader />
 
-         <div className="chatContainer scroll-smooth flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary scrollbar-track-base-300 px-4">
+         <div
+            className="chatContainer scroll-smooth flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-primary scrollbar-track-base-300 px-4"
+            style={{ scrollBehavior: 'smooth' }}
+         >
             {messages.length ? (
                <>
-                  {messages.map((message) => {
+                  {messages.map((message, index) => {
                      const isOwn = message.senderId === authUser.user._id;
+
+                     // Assign ref only to the last message for scrolling
+                     const isLastMessage = index === messages.length - 1;
+
                      return (
                         <div
                            key={message._id}
                            className={`chat ${isOwn ? 'chat-end' : 'chat-start'}`}
-                           ref={messageEndRef}
+                           ref={isLastMessage ? messageEndRef : null}
                         >
                            <div className="chat-image avatar">
                               <div className="size-10 rounded-full border">
@@ -90,6 +98,8 @@ const ChatContainer = () => {
                                  <button
                                     className="btn btn-xs btn-ghost p-1"
                                     onClick={() => startEditingMessage(message)}
+                                    aria-label="Edit message"
+                                    type="button"
                                  >
                                     <Pencil size={14} />
                                  </button>
@@ -109,9 +119,9 @@ const ChatContainer = () => {
                                     }}
                                     src={message.image.url}
                                     alt="Attachment"
-                                    className={`max-w-[250px] max-h-[200px] rounded-md mb-2 ${
+                                    className={`max-w-[250px] max-h-[200px] rounded-md mb-2 cursor-pointer ${
                                        message.image.aspectRatio || ''
-                                    } cursor-pointer`}
+                                    }`}
                                  />
                               )}
                               {message.text && <p>{message.text}</p>}
@@ -121,9 +131,9 @@ const ChatContainer = () => {
                   })}
                </>
             ) : (
-               <div className="w-full h-full flex justify-center items-center">
-                  <p className="text-center">
-                     There is no messages. Say{' '}
+               <div className="w-full h-full flex justify-center items-center p-4">
+                  <p className="text-center text-gray-500">
+                     There are no messages. Say{' '}
                      <strong className="text-primary">&quot;Hello&quot;</strong> to start a
                      conversation
                   </p>

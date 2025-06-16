@@ -21,8 +21,8 @@ const useChatStore = create((set, get) => ({
          const res = await axiosInstance.get('/messages/users');
          set({ users: res.data.users });
       } catch (error) {
-         console.log('getUsers error', error);
-         toast.error(error.response.data.msg);
+         console.error('getUsers error', error);
+         toast.error(error?.response?.data?.msg || 'Failed to fetch users');
       } finally {
          set({ isUsersLoading: false });
       }
@@ -34,8 +34,8 @@ const useChatStore = create((set, get) => ({
          const res = await axiosInstance.get(`/messages/${receiverId}`);
          set({ messages: res.data.messages });
       } catch (error) {
-         console.log('getMessages error', error);
-         toast.error(error.response.data.msg);
+         console.error('getMessages error', error);
+         toast.error(error?.response?.data?.msg || 'Failed to fetch messages');
       } finally {
          set({ isMessagesLoading: false });
       }
@@ -45,14 +45,16 @@ const useChatStore = create((set, get) => ({
       set({ isMessageSending: true });
       try {
          const { selectedUser, messages } = get();
+         if (!selectedUser?._id) throw new Error('No selected user');
+
          const res = await axiosInstance.post(
             `/messages/send-message/${selectedUser._id}`,
             messageData
          );
          set({ messages: [...messages, res.data.message] });
       } catch (error) {
-         console.log('sendMessage error', error);
-         toast.error(error.response.data.msg);
+         console.error('sendMessage error', error);
+         toast.error(error?.response?.data?.msg || 'Failed to send message');
       } finally {
          set({ isMessageSending: false });
       }
@@ -63,26 +65,44 @@ const useChatStore = create((set, get) => ({
          const res = await axiosInstance.put(`/messages/edit-message/${messageId}`, updatedData);
          const updatedMessage = res.data.message;
 
-         // Replace the message in state
          const updatedMessages = get().messages.map((msg) =>
             msg._id === messageId ? updatedMessage : msg
          );
          set({ messages: updatedMessages });
       } catch (error) {
-         console.log('editMessage error', error);
-         toast.error(error.response.data.msg);
+         console.error('editMessage error', error);
+         toast.error(error?.response?.data?.msg || 'Failed to edit message');
       }
    },
 
    subscribeToMessages: () => {
       const { selectedUser } = get();
       if (!selectedUser) return;
+
       const socket = useAuthStore.getState().socket;
+      if (!socket) {
+         console.warn('Socket not initialized');
+         return;
+      }
+
+      // Remove any existing listener first to avoid duplicates
+      socket.off('newMessage');
 
       socket.on('newMessage', (newMessage) => {
-         const isFromOtherUser = newMessage.senderId !== selectedUser._id;
-         set({ messages: [...get().messages, newMessage] });
+         // Check if the message is relevant to current chat
+         if (
+            !selectedUser ||
+            (newMessage.senderId !== selectedUser._id && newMessage.receiverId !== selectedUser._id)
+         ) {
+            // Ignore messages not related to selected user
+            return;
+         }
 
+         set((state) => ({ messages: [...state.messages, newMessage] }));
+
+         // Play notification only if message is from other user (not me)
+         const authUser = useAuthStore.getState().authUser;
+         const isFromOtherUser = newMessage.senderId !== authUser?.user?._id;
          if (isFromOtherUser) {
             const audio = document.getElementById('notif-audio');
             if (audio) {
@@ -94,6 +114,7 @@ const useChatStore = create((set, get) => ({
 
    unsubscribeFromMessages: () => {
       const socket = useAuthStore.getState().socket;
+      if (!socket) return;
       socket.off('newMessage');
    },
 

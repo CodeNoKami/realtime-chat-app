@@ -15,9 +15,11 @@ const allowedOrigins = process.env.CLIENT_URL
 
 const io = new Server(server, {
    cors: {
-      origin: '*',
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      origin: (origin, callback) => {
+         callback(null, origin || '*'); // Reflect origin
+      },
       credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
    },
 });
 

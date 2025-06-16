@@ -25,7 +25,7 @@ const LightBox = ({ src, onClose }) => {
             <img
                src={src}
                alt="Preview"
-               className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg shadow-lg"
+               className="max-w-[90vw] max-h-[90vh] object-cover rounded-lg shadow-lg"
                draggable={false}
             />
          </div>

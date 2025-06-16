@@ -12,6 +12,12 @@ const MessageInput = () => {
    const [imagePreview, setImagePreview] = useState(null);
    const fileInputRef = useRef(null);
 
+   const clearInput = () => {
+      setText('');
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = null;
+   };
+
    const handleImageChange = (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -51,9 +57,7 @@ const MessageInput = () => {
             await sendMessage(messageData);
          }
 
-         setText('');
-         setImagePreview(null);
-         if (fileInputRef.current) fileInputRef.current.value = null;
+         clearInput();
       } catch (error) {
          console.error('Failed to send message', error);
          toast.error('Failed to send message');
@@ -144,7 +148,10 @@ const MessageInput = () => {
             <div className="text-sm text-gray-400 mt-1 flex items-center gap-4">
                <span>Editing message</span>
                <button
-                  onClick={clearEditingMessage}
+                  onClick={() => {
+                     clearEditingMessage();
+                     clearInput();
+                  }}
                   className="text-xs text-red-400 underline hover:text-red-300"
                   type="button"
                >

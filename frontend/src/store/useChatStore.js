@@ -106,6 +106,7 @@ const useChatStore = create((set, get) => ({
          if (isFromOtherUser) {
             const audio = document.getElementById('notif-audio');
             if (audio) {
+               audio.currentTime = 0; // Reset to the start
                audio.play().catch((err) => console.warn('Audio playback blocked:', err));
             }
          }

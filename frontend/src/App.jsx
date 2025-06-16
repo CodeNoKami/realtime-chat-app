@@ -28,7 +28,7 @@ const App = () => {
 
    return (
       <div data-theme={theme} className="scrollbar-thin ">
-         <audio id="notif-audio" src="/iphone_notification.mp3" preload="auto" />
+         <audio id="notif-audio" src="/iphone_notification.mp3" preload="auto"></audio>
          <Toaster
             position="top-center"
             reverseOrder={false}

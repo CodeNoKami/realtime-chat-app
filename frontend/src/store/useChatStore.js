@@ -57,22 +57,22 @@ const useChatStore = create((set, get) => ({
 
    subscribeToMessages: () => {
       const { selectedUser } = get();
+      if (!selectedUser) return;
+
       const socket = useAuthStore.getState().socket;
-      const authUser = useAuthStore.getState().authUser;
-
-      if (!socket || !authUser) return;
-
-      const notificationAudio = new Audio('/iphone_notification.mp3');
 
       socket.on('newMessage', (newMessage) => {
-         const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser?._id;
+         const isFromOtherUser = newMessage.senderId !== selectedUser._id;
 
-         // Add new message to state
+         // Add to messages
          set({ messages: [...get().messages, newMessage] });
 
-         // ✅ If this user is the receiver and not actively chatting with the sender, play sound
-         if (newMessage.receiverId === authUser._id && !isMessageSentFromSelectedUser) {
-            notificationAudio.play().catch((err) => console.warn('Failed to play sound:', err));
+         // Play notification sound
+         if (isFromOtherUser) {
+            const audio = document.getElementById('notif-audio');
+            if (audio) {
+               audio.play().catch((err) => console.warn('Audio playback blocked:', err));
+            }
          }
       });
    },

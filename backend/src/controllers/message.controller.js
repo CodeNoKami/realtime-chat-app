@@ -106,3 +106,71 @@ export const sendMessage = async (req, res) => {
       error500(res);
    }
 };
+
+export const editMessage = async (req, res) => {
+   try {
+      const { messageId } = req.params;
+      const { text, image } = req.body;
+      const userId = req.user._id;
+
+      const message = await Message.findById(messageId);
+
+      if (!message) {
+         return res.status(404).json({ msg: 'Message not found', isSuccess: false });
+      }
+
+      // ✅ Ensure the user is the sender
+      if (message.senderId.toString() !== userId.toString()) {
+         return res
+            .status(403)
+            .json({ msg: 'Unauthorized to edit this message', isSuccess: false });
+      }
+
+      let imageData = message.image; // Default to existing image
+
+      // ✅ If new image is sent, upload it
+      if (image && image !== message.image?.url) {
+         const uploadResponse = await cloudinary.uploader.upload(image, {
+            resource_type: 'image',
+            transformation: [{ width: 2000, height: 2000, crop: 'limit' }],
+         });
+
+         let ratio;
+         if (uploadResponse.width > uploadResponse.height) {
+            ratio = 'aspect-[16/9]';
+         } else if (uploadResponse.width < uploadResponse.height) {
+            ratio = 'aspect-[1/2]';
+         } else {
+            ratio = 'aspect-[1/1]';
+         }
+
+         imageData = {
+            url: uploadResponse.secure_url || '',
+            width: uploadResponse.width || 0,
+            height: uploadResponse.height || 0,
+            aspectRatio: ratio,
+         };
+      }
+
+      // ✅ Update the message
+      message.text = text || message.text;
+      message.image = imageData;
+      await message.save();
+
+      // ✅ Emit event to frontend
+      const receiverSocketId = getReceiverSocketId(message.reciverId);
+      if (receiverSocketId) {
+         io.to(receiverSocketId).emit('messageEdited', message);
+      }
+
+      res.status(200).json({
+         message,
+         msg: 'Message updated successfully.',
+         isSuccess: true,
+         statusCode: 200,
+      });
+   } catch (error) {
+      console.error('Error editing message:', error.message);
+      error500(res);
+   }
+};

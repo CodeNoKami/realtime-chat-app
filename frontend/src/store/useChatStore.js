@@ -1,6 +1,5 @@
 import toast from 'react-hot-toast';
 import { create } from 'zustand';
-
 import axiosInstance from '../lib/axios';
 import { useAuthStore } from './useAuthStore';
 
@@ -11,6 +10,11 @@ const useChatStore = create((set, get) => ({
    isUsersLoading: false,
    isMessagesLoading: false,
    isMessageSending: false,
+   editingMessage: null,
+
+   setEditingMessage: (message) => set({ editingMessage: message }),
+   clearEditingMessage: () => set({ editingMessage: null }),
+
    getUsers: async () => {
       set({ isUsersLoading: true });
       try {
@@ -45,7 +49,6 @@ const useChatStore = create((set, get) => ({
             `/messages/send-message/${selectedUser._id}`,
             messageData
          );
-
          set({ messages: [...messages, res.data.message] });
       } catch (error) {
          console.log('sendMessage error', error);
@@ -55,19 +58,31 @@ const useChatStore = create((set, get) => ({
       }
    },
 
+   editMessage: async (messageId, updatedData) => {
+      try {
+         const res = await axiosInstance.put(`/messages/edit-message/${messageId}`, updatedData);
+         const updatedMessage = res.data.message;
+
+         // Replace the message in state
+         const updatedMessages = get().messages.map((msg) =>
+            msg._id === messageId ? updatedMessage : msg
+         );
+         set({ messages: updatedMessages });
+      } catch (error) {
+         console.log('editMessage error', error);
+         toast.error(error.response.data.msg);
+      }
+   },
+
    subscribeToMessages: () => {
       const { selectedUser } = get();
       if (!selectedUser) return;
-
       const socket = useAuthStore.getState().socket;
 
       socket.on('newMessage', (newMessage) => {
          const isFromOtherUser = newMessage.senderId !== selectedUser._id;
-
-         // Add to messages
          set({ messages: [...get().messages, newMessage] });
 
-         // Play notification sound
          if (isFromOtherUser) {
             const audio = document.getElementById('notif-audio');
             if (audio) {
@@ -76,6 +91,7 @@ const useChatStore = create((set, get) => ({
          }
       });
    },
+
    unsubscribeFromMessages: () => {
       const socket = useAuthStore.getState().socket;
       socket.off('newMessage');

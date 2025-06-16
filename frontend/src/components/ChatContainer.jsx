@@ -22,6 +22,7 @@ const ChatContainer = () => {
       subscribeToMessages,
       unsubscribeFromMessages,
       startEditingMessage,
+      editingMessage,
    } = useChatStore();
 
    const { authUser } = useAuthStore();
@@ -38,10 +39,13 @@ const ChatContainer = () => {
    }, [selectedUser?._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
    useEffect(() => {
-      if (messageEndRef.current) {
-         messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (!editingMessage) {
+         // Scroll to the bottom only if not editing a message
+         if (messageEndRef.current) {
+            messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+         }
       }
-   }, [messages]);
+   }, [messages, editingMessage]);
 
    if (isMessagesLoading)
       return (

@@ -1,6 +1,6 @@
 import toast from 'react-hot-toast';
 import { create } from 'zustand';
-import notificationSound from '../assets/iphone_notification.mp3';
+
 import axiosInstance from '../lib/axios';
 import { useAuthStore } from './useAuthStore';
 
@@ -62,7 +62,7 @@ const useChatStore = create((set, get) => ({
 
       if (!socket || !authUser) return;
 
-      const notificationAudio = new Audio(notificationSound);
+      const notificationAudio = new Audio('/iphone_notification.mp3');
 
       socket.on('newMessage', (newMessage) => {
          const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser?._id;

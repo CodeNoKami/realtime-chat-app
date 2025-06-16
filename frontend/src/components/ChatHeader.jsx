@@ -38,8 +38,8 @@ const ChatHeader = () => {
 
                <div>
                   <h3 className="font-medium">{selectedUser.fullName}</h3>
-                  <p className="text-sm text-base-content/70">
-                     {isOnline ? 'Online' : `Last seen ${formatTimeAgo(selectedUser.lastActiveAt)}`}
+                  <p className={`text-sm text-base-content/70 ${isOnline ? 'text-primary' : ''}`}>
+                     {isOnline ? 'online' : `last seen ${formatTimeAgo(selectedUser.lastActiveAt)}`}
                   </p>
                </div>
             </div>

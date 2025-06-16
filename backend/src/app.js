@@ -10,14 +10,14 @@ import userRoutes from './routes/user.route.js';
 
 dotenv.config();
 
-const allowedOrigins = [process.env.CLIENT_URL, 'http://localhost:5173'];
+const allowedOrigins = process.env.CLIENT_URL
+   ? process.env.CLIENT_URL.split(',')
+   : ['http://localhost:5173'];
 
 app.use(
    cors({
       origin: function (origin, callback) {
-         // allow requests with no origin like mobile apps or curl requests
-         if (!origin) return callback(null, true);
-         if (allowedOrigins.includes(origin)) {
+         if (!origin || allowedOrigins.includes(origin)) {
             callback(null, true);
          } else {
             callback(new Error('CORS policy: This origin is not allowed'));
@@ -34,10 +34,16 @@ app.use(cookieParser());
 app.use('/auth', userRoutes);
 app.use('/messages', messageRoutes);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 5000;
 
-connectDB();
-
-server.listen(PORT, () => {
-   console.log(`Server is running on port ${PORT}`);
-});
+connectDB()
+   .then(() => {
+      server.listen(PORT, () => {
+         console.log(`🚀 Server running on port ${PORT}`);
+      });
+   })
+   .catch((err) => {
+      console.error('❌ DB connection failed. Server not started.');
+      console.error(err);
+      process.exit(1);
+   });
